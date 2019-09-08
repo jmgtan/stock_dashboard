@@ -1,0 +1,16 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "symbol=:symbol and data_timestamp>=:ts",
+        "expressionValues" : {
+            ":symbol": $util.dynamodb.toDynamoDBJson($ctx.args.symbol),
+            ":ts": $util.dynamodb.toDynamoDBJson($ctx.args.ts)
+        }
+    },
+    "index" : "BySymbol",
+    "nextToken" : $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null)),
+    "limit" : $util.defaultIfNull(${ctx.args.limit}, 20),
+    "scanIndexForward" : false,
+    "consistentRead" : false
+}

@@ -1,0 +1,19 @@
+{
+	"dev": {
+		"awscloudformation": {
+			"AuthRoleName": "stockmonitoringdashb-dev-20190819121234-authRole",
+			"UnauthRoleArn": "arn:aws:iam::284546856933:role/stockmonitoringdashb-dev-20190819121234-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::284546856933:role/stockmonitoringdashb-dev-20190819121234-authRole",
+			"Region": "eu-west-1",
+			"DeploymentBucketName": "stockmonitoringdashb-dev-20190819121234-deployment",
+			"UnauthRoleName": "stockmonitoringdashb-dev-20190819121234-unauthRole",
+			"StackName": "stockmonitoringdashb-dev-20190819121234",
+			"StackId": "arn:aws:cloudformation:eu-west-1:284546856933:stack/stockmonitoringdashb-dev-20190819121234/3ed5f3a0-c272-11e9-a06b-0ae15a4dadda"
+		},
+		"categories": {
+			"auth": {
+				"stockmonitoringdashb41a7f230": {}
+			}
+		}
+	}
+}

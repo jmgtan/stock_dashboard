@@ -1,0 +1,11 @@
+{
+    "AppSyncApiName": "stockmonitoringdashb",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": "false",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authstockmonitoringdashb41a7f230",
+            "Outputs.UserPoolId"
+        ]
+    }
+}
