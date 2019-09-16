@@ -55,9 +55,8 @@ class DashboardComponent extends Component {
 
         if (!isAddedToBuffer) {
             dataPoints[symbol].points.push(point);
+            this.setState({dataPoints: dataPoints});
         }
-
-        this.setState({dataPoints: dataPoints});
     }
 
     componentWillUnmount = async() => {
