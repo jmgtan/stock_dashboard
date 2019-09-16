@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import { async } from 'q';
 import * as queries from '../graphql/queries';
+import * as subscriptions from '../graphql/subscriptions';
 import {API, graphqlOperation} from 'aws-amplify';
 import Chart from './CandleStickChartForDiscontinuousIntraDay';
-const moment = require("moment-timezone");
 
 const PRICE_LIMIT = 50;
 
@@ -15,16 +15,55 @@ class DashboardComponent extends Component {
         this.state = {  
             symbols: []
         };
+
+        this.subscription = null;
+        this.buffer = {};
     }
 
     componentDidMount = async() => {
-        var dataPoints = await this.loadDashboard();
-        var symbols = Object.keys(dataPoints);
-        this.setState({
-            dataPoints: dataPoints,
-            symbols: symbols
-        })
-        ;
+        await this.loadDashboard();
+
+        this.subscription = API.graphql(graphqlOperation(subscriptions.onCreateIntradayStockPrice)).subscribe({
+            next: this.handleSubscription.bind(this)
+        });
+    }
+
+    handleSubscription(data) {
+        var row = data.value.data["onCreateIntradayStockPrice"];
+
+        var symbol = row.symbol;
+
+        var point = {
+            date: new Date(+row.data_timestamp * 1000),
+            open: +row.open_price,
+            high: +row.high_price,
+            low: +row.low_price,
+            close: +row.close_price,
+            volume: +row.volume
+        };
+
+        var isAddedToBuffer = false;
+        var dataPoints = this.state.dataPoints;
+        
+        if (dataPoints[symbol].points.length == 0 && this.buffer[symbol].length == 0) {
+            this.buffer[symbol].push(point);
+            isAddedToBuffer = true;
+        } else if (this.buffer[symbol].length > 0) {
+            dataPoints[symbol].points = dataPoints[symbol].points.concat(this.buffer[symbol]);
+            this.buffer[symbol] = [];
+        }
+
+        if (!isAddedToBuffer) {
+            dataPoints[symbol].points.push(point);
+        }
+
+        this.setState({dataPoints: dataPoints});
+    }
+
+    componentWillUnmount = async() => {
+        if (this.subscription != null) {
+            this.subscription.unsubscribe();
+        }
     }
 
     loadDashboard = async() => {
@@ -34,24 +73,24 @@ class DashboardComponent extends Component {
         for (var i in symbols) {
             var symbol = symbols[i];
             var symbolText = symbol.symbol;
+            this.buffer[symbolText] = [];
             dataPointsBySymbol[symbolText] = await this.retrieveLatestPricesBySymbol(symbolText);
         }
 
-        return dataPointsBySymbol
+        this.setState({
+            dataPoints: dataPointsBySymbol,
+            symbols: Object.keys(dataPointsBySymbol)
+        });
     }
 
     retrieveLatestPricesBySymbol = async(symbol) => {
         var nextToken = null;
-        var queryTimestamp = this.generateQueryTimestamp();
         var dataPoints = [];
-
-        var minTs = Number.MAX_SAFE_INTEGER;
-        var maxTs = 0;
 
         do {
             var results = await API.graphql(graphqlOperation(queries.retrieveLatestIntradayPrices, {
                 symbol: symbol,
-                ts: queryTimestamp,
+                ts: 0,
                 nextToken: nextToken
             }));   
             
@@ -71,9 +110,6 @@ class DashboardComponent extends Component {
                         volume: +item.volume
                     };
 
-                    minTs = Math.min(minTs, point.date);
-                    maxTs = Math.max(maxTs, point.date);
-
                     dataPoints.push(point);
                 }
                 
@@ -81,14 +117,8 @@ class DashboardComponent extends Component {
         } while (nextToken != null);
 
         return {
-            min_date: new Date(minTs),
-            max_date: new Date(maxTs),
             points: dataPoints.reverse()
         };
-    }
-
-    generateQueryTimestamp() {
-        return moment(moment().format("YYYY")+"-01-01").unix();
     }
 
     render() {
@@ -96,13 +126,19 @@ class DashboardComponent extends Component {
             <div>
                 <h3>Dashboard</h3>
                 <a href="/manage-stock-symbols">Manage Stock Symbols</a>
-                <div className="mt-2">
+                <div>
                     {this.state.symbols.map(symbol => {
+                        var hasDataPoints = this.state.dataPoints[symbol].points.length > 0;
                         return (
-                            <div>
+                            <div className="m-2">
                                 <h3>{symbol}</h3>
-                                <div>
-                                    <Chart data={this.state.dataPoints[symbol].points} />
+                                <div className="border">
+                                    {hasDataPoints ? (
+                                        <Chart symbol={symbol} data={this.state.dataPoints[symbol].points} />
+                                    ) : (
+                                        <div className="p-2"><h5 className="text-danger">No data points</h5></div>
+                                    )}
+                                    
                                 </div>
                             </div>
                         )

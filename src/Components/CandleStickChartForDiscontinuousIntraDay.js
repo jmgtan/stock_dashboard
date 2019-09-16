@@ -27,7 +27,7 @@ import { last } from "react-stockcharts/lib/utils";
 
 class CandleStickChartForDiscontinuousIntraDay extends React.Component {
 	render() {
-		const { type, data: initialData, width, ratio } = this.props;
+		const { type, data: initialData, width, ratio, symbol } = this.props;
 
 		if (type == null) {
 			type = "hybrid";
@@ -47,12 +47,12 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component {
 		const xExtents = [start, end];
 
 		return (
-			<ChartCanvas height={400}
+			<ChartCanvas height={600}
 				ratio={ratio}
 				width={width}
 				margin={{ left: 80, right: 80, top: 10, bottom: 30 }}
 				type={type}
-				seriesName="AMZN"
+				seriesName={symbol}
 				data={data}
 				xScale={xScale}
 				xAccessor={xAccessor}

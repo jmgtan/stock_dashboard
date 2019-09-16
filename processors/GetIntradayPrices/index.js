@@ -59,6 +59,7 @@ const getPrices = async(apiKey, symbol) => {
         const ts = moment.tz(i, timezone).unix();
         const price = feedPrices[i];
         prices.push({
+            id: symbol+"-"+ts,
             symbol: symbol,
             data_timezone: timezone,
             data_timestamp: ts,
@@ -76,7 +77,11 @@ const getPrices = async(apiKey, symbol) => {
 const writePrices = async(client, prices) => {
     for (i in prices) {
         const price = prices[i];
-        await client.mutate({mutation: createIntradayStockPrice, variables: {input: price}});
+        try {
+            await client.mutate({mutation: createIntradayStockPrice, variables: {input: price}});
+        } catch (e) {
+
+        }
     }
 }
 
