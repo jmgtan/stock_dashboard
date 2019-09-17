@@ -16,20 +16,26 @@ class DashboardComponent extends Component {
             symbols: []
         };
 
-        this.subscription = null;
+        this.mountedSubscriptions = {};
         this.buffer = {};
     }
 
     componentDidMount = async() => {
-        await this.loadDashboard();
+        var symbolKeys = await this.loadDashboard();
 
-        this.subscription = API.graphql(graphqlOperation(subscriptions.onCreateIntradayStockPrice)).subscribe({
-            next: this.handleSubscription.bind(this)
-        });
+        if (symbolKeys.length > 0) {
+            for (var i in symbolKeys) {
+                var symbolKey = symbolKeys[i];
+
+                this.mountedSubscriptions[symbolKey] = API.graphql(graphqlOperation(subscriptions.intradayStockPriceCreated, {symbol: symbolKey})).subscribe({
+                    next: this.handleSubscription.bind(this)
+                });
+            }
+        }
     }
 
     handleSubscription(data) {
-        var row = data.value.data["onCreateIntradayStockPrice"];
+        var row = data.value.data["intradayStockPriceCreated"];
 
         var symbol = row.symbol;
 
@@ -60,8 +66,10 @@ class DashboardComponent extends Component {
     }
 
     componentWillUnmount = async() => {
-        if (this.subscription != null) {
-            this.subscription.unsubscribe();
+        for (var symbolKey in this.mountedSubscriptions) {
+            console.log("Unsubscribing "+symbolKey);
+            this.mountedSubscriptions[symbolKey].unsubscribe();
+            this.mountedSubscriptions[symbolKey] = null;
         }
     }
 
@@ -76,10 +84,14 @@ class DashboardComponent extends Component {
             dataPointsBySymbol[symbolText] = await this.retrieveLatestPricesBySymbol(symbolText);
         }
 
+        var symbolKeys = Object.keys(dataPointsBySymbol);
+
         this.setState({
             dataPoints: dataPointsBySymbol,
-            symbols: Object.keys(dataPointsBySymbol)
+            symbols: symbolKeys
         });
+
+        return symbolKeys;
     }
 
     retrieveLatestPricesBySymbol = async(symbol) => {

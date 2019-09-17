@@ -6,6 +6,7 @@ export const listAllStockSymbols = `query ListAllStockSymbols($limit: Int, $next
     items {
       id
       symbol
+      owner
     }
     nextToken
   }
@@ -81,6 +82,7 @@ export const getStockSymbol = `query GetStockSymbol($id: ID!) {
   getStockSymbol(id: $id) {
     id
     symbol
+    owner
   }
 }
 `;
@@ -93,6 +95,7 @@ export const listStockSymbols = `query ListStockSymbols(
     items {
       id
       symbol
+      owner
     }
     nextToken
   }

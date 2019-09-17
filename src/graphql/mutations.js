@@ -47,6 +47,7 @@ export const createStockSymbol = `mutation CreateStockSymbol($input: CreateStock
   createStockSymbol(input: $input) {
     id
     symbol
+    owner
   }
 }
 `;
@@ -54,6 +55,7 @@ export const updateStockSymbol = `mutation UpdateStockSymbol($input: UpdateStock
   updateStockSymbol(input: $input) {
     id
     symbol
+    owner
   }
 }
 `;
@@ -61,6 +63,7 @@ export const deleteStockSymbol = `mutation DeleteStockSymbol($input: DeleteStock
   deleteStockSymbol(input: $input) {
     id
     symbol
+    owner
   }
 }
 `;

@@ -1,4 +1,4 @@
-type IntradayStockPrice @model 
+type IntradayStockPrice @model(subscriptions: null)
 	@key(name: "BySymbol", fields: ["symbol", "data_timestamp"])
 {
 	id: ID!
@@ -12,9 +12,14 @@ type IntradayStockPrice @model
 	volume: Int
 }
 
-type StockSymbol @model @auth(rules: [{allow: owner}]) {
+type Subscription {
+	intradayStockPriceCreated(symbol: String): IntradayStockPrice @aws_subscribe(mutations: ["createIntradayStockPrice"])
+}
+
+type StockSymbol @model(subscriptions: null) @auth(rules: [{allow: owner}]) {
 	id: ID!
 	symbol: String!
+	owner: String
 }
 
 type StockSymbolConnection {
