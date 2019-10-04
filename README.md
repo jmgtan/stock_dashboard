@@ -1,68 +1,111 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Stock Monitoring Dashboard
 
-## Available Scripts
+## Components
 
-In the project directory, you can run:
+This demo application consists of the following components:
 
-### `npm start`
+* The frontend is built using React JS
+* The backend is using AWS AppSync via AWS Amplify Framework
+* Authentication is done via Amazon Cognito
+* AWS Secrets Manager is used to store the API Keys that will be used to query the data feed.
+* AWS Lambda and Amazon CloudWatch Events are used to regularly fetch the latest Intraday prices from the data feed.
+* The data feed that this demo uses is from [Alpha Vantage](https://alphavantage.co)
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## High-Level Architecture
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+![Image of High-Level Architecture](blog_stock_dashboard.png)
 
-### `npm test`
+# Local Installation
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Install the [AWS Amplify Framework CLI](https://aws-amplify.github.io/docs/)
 
-### `npm run build`
+```bash
+npm install -g @aws-amplify/cli
+amplify configure
+```
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+```bash
+git clone git@github.com:jmgtan/stock_dashboard.git
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.
 
-### `npm run eject`
+```bash
+amplify env add
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Use the following values:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* Do you want to use an existing environment? No
+* Enter a name for the environment. You can just input "local"
+* Do you want to use an AWS profile? If you have a profile configured via the AWS CLI, you can reuse the same profile, otherwise choose No and configure accordingly.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+amplify push
+```
 
-## Learn More
+Just use the default answers and follow the instructions.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The push commands will create the following:
+* Cognito User Pool
+* DynamoDB
+* AppSync API
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Setup the Data Feed Integration
 
-### Code Splitting
+Open the file `src/aws-exports.js` and take note of the value of `aws_user_pools_id`. We will be using this to create a new app client for the Cognito User Pool.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+## Register for an API Key from the Data Feed Provider
 
-### Analyzing the Bundle Size
+Go to [Alpha Vantage](https://www.alphavantage.co), and get a free API key.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+## Create Cognito User Pool Client for the Backend
 
-### Making a Progressive Web App
+```bash
+aws cognito-idp create-user-pool-client --user-pool-id <value of user pool id> --client-name BackendClient --explicit-auth-flows "ADMIN_NO_SRP_AUTH"
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+Take note of the return payload, specifically the `ClientId`.
 
-### Advanced Configuration
+## Create Backend User
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+We're going to create a new user in the user pool specifically for the use of the backend Lambda function to be able to call the AppSync mutation APIs.
 
-### Deployment
+```bash
+aws cognito-idp admin-create-user --user-pool-id <value of user pool id> --username "<email of new admin user>" --user-attributes=Name=email,Value="<email of new admin user>" --message-action "SUPPRESS"
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+aws cognito-idp admin-set-user-password --user-pool-id eu-west-1_qqHO7Lr1S --username "<email of new admin user>" --password "<password>" --permanent
+```
 
-### `npm run build` fails to minify
+Remember the email and password for the admin user, the next step is to store these values in AWS Secrets Manager for the backend Lambda function to consume.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Create Secrets Manager Entries
+
+Create entry for the backend user account
+
+```bash
+aws secretsmanager create-secret --name "stockMonitoring/<env>/backend" --secret-string '{"username": "<backend username>", "password": "<backend password>"}'
+```
+
+Create entry for the data feed API key
+
+```bash
+aws secretsmanager create-secret --name "stockMonitoringDashboard/<env>/datafeed" --secret-string '{"feed_api_key": "<feed api key>"}'
+```
+
+## Configure the Backend Lambda
+
+Open the file `processors/GetIntradayPrices/config-exports.js`
+
+Update the following values:
+
+* `cognito_pool_id`: use the value from the file `src/aws-exports.js` in the `aws_user_pools_id` variable
+* `cognito_backend_client_id`: use the value from the `ClientId` of the backend client that was created in the previous section.
+* `cognito_backend_access_key`: value is `stockMonitoring/<env>/backend`
+* `appsync_endpoint_url`: use the value from the file `src/aws-exports.js` in the `aws_appsync_graphqlEndpoint` variable
+* `appsync_region`: use the value from the file `src/aws-exports.js` in the `aws_appsync_region` variable
+* `data_feed_key`: value is `stockMonitoring/<env>/datafeed`
