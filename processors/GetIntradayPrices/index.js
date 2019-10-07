@@ -74,7 +74,7 @@ const getPrices = async(apiKey, symbol) => {
             });
         }
     
-        return prices;
+        return prices.reverse();
     }
 }
 
@@ -89,7 +89,7 @@ const writePrices = async(client, prices) => {
     }
 }
 
-const test = async() => {
+exports.handler = async(event) => {
     const sm = new AWS.SecretsManager();
     const backendTokens = await getBackendTokens(sm);
     const client = buildAppSyncClient(backendTokens);
@@ -121,5 +121,3 @@ const test = async() => {
         }
     } while (nextToken != null);
 }
-
-test();

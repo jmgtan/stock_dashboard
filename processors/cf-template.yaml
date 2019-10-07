@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  GetIntradayPricesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: GetIntradayPrices/
+      Runtime: nodejs10.x
+      MemorySize: 256
+      Timeout: 120
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: 'Allow'
+              Action:
+                - secretsmanager:GetSecretValue
+                - cognito-idp:AdminInitiateAuth
+              Resource: '*'
+      Events:
+        ScheduledExec:
+          Type: Schedule
+          Properties:
+            Schedule: rate(30 minutes)
+            Name: GetIntradayPricesSchedule
+            Enabled: true

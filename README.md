@@ -13,7 +13,7 @@ This demo application consists of the following components:
 
 ## High-Level Architecture
 
-![Image of High-Level Architecture](blog_stock_dashboard.png)
+![Image of High-Level Architecture](doc-images/blog_stock_dashboard.png)
 
 # Local Installation
 
@@ -21,7 +21,6 @@ This demo application consists of the following components:
 
 ```bash
 npm install -g @aws-amplify/cli
-amplify configure
 ```
 
 ## Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
@@ -109,3 +108,32 @@ Update the following values:
 * `appsync_endpoint_url`: use the value from the file `src/aws-exports.js` in the `aws_appsync_graphqlEndpoint` variable
 * `appsync_region`: use the value from the file `src/aws-exports.js` in the `aws_appsync_region` variable
 * `data_feed_key`: value is `stockMonitoring/<env>/datafeed`
+
+## Deploy via CloudFormation
+
+Create S3 bucket to serve as the staging area for deploying the Lambda function. This will be used by the AWS CloudFormation package command.
+
+```bash
+aws s3api create-bucket --bucket <staging bucket name> --create-bucket-configuration LocationConstraint=eu-west-1
+```
+
+Next we package and stage the Lambda function
+
+```bash
+cd processors
+aws cloudformation package --template-file cf-template.yaml --s3-bucket <staging bucket name> --output-template-file packaged-template.yaml
+```
+
+Once the command succeeds you can then execute the deploy command
+
+```bash
+aws cloudformation deploy --template-file packaged-template.yaml --stack-name <stack name> --capabilities CAPABILITY_IAM
+```
+
+Once deployment completes, going to the CloudFormation console and into the stack, you should be able to see the list of resources that were created
+
+![List of CloudFormation Resources](doc-images/cf-resources.png)
+
+Clicking the Lambda function, you should be able to see the trigger, which is a CloudWatch scheduled event for every 30 mins.
+
+![Lambda Trigger](doc-images/lambda-trigger.png)
