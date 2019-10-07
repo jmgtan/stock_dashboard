@@ -54,6 +54,22 @@ The push commands will create the following:
 * DynamoDB
 * AppSync API
 
+# Deploy Application using Amplify Console
+
+Go to the AWS Management Console and then Amplify. Click "Get Started" under "Deploy", see following screenshot:
+
+![Amplify Overview](doc-images/amplify-overview-deploy.png)
+
+You should be able to see a screen like the following:
+
+![Amplify Connect](doc-images/amplify-connect.png)
+
+Either "fork" from the GitHub repository, or clone and then push to your own repository. Once your repo has been selected, Amplify should automatically generate a build configuration. Make sure to select "Create new environment":
+
+![Amplify Build Settings](doc-images/amplify-build-settings.png)
+
+Also create a new [Service Role](https://docs.aws.amazon.com/amplify/latest/userguide/how-to-service-role-amplify-console.html) and then click "Next", confirm and then deploy. This will automatically deploy both frontend and backend. You can keep track of the deployment process by drilling down and see the logs that are being streamed in.
+
 # Setup the Data Feed Integration
 
 Open the file `src/aws-exports.js` and take note of the value of `aws_user_pools_id`. We will be using this to create a new app client for the Cognito User Pool.
