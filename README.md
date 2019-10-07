@@ -117,10 +117,17 @@ Create S3 bucket to serve as the staging area for deploying the Lambda function.
 aws s3api create-bucket --bucket <staging bucket name> --create-bucket-configuration LocationConstraint=eu-west-1
 ```
 
+Next we should install the dependencies that the function requires, do the following:
+
+```bash
+cd processors/GetIntradayPrices
+npm install
+```
+
 Next we package and stage the Lambda function
 
 ```bash
-cd processors
+cd ..
 aws cloudformation package --template-file cf-template.yaml --s3-bucket <staging bucket name> --output-template-file packaged-template.yaml
 ```
 
@@ -137,3 +144,29 @@ Once deployment completes, going to the CloudFormation console and into the stac
 Clicking the Lambda function, you should be able to see the trigger, which is a CloudWatch scheduled event for every 30 mins.
 
 ![Lambda Trigger](doc-images/lambda-trigger.png)
+
+# Testing
+
+If you deployed the application locally, you can start the server using the following command
+
+```bash
+npm start
+```
+
+This command would automatically open the browser. If this is your first time accessing the application, you should create a new account and validate it. Once you're logged in you can start adding stock symbols to monitor. See the following screenshot:
+
+![Manage Stock Symbols](doc-images/manage-stock-symbols.png)
+
+You can then either wait for the Lambda function to trigger to start populating the data, or you can manually trigger. See the following screenshots on how to manually trigger:
+
+Go to the console and look for the Lambda function that was created by the CloudFormation template, click test:
+
+![Click the Test Button](doc-images/lambda-console-test-btn.png)
+
+The Lambda function doesn't really need any payload, so you can just pass in an empty JSON document
+
+![Lambda Console Test Form](doc-images/lambda-console-test-form.png)
+
+Once the test event has been created, you can click the Test button again and it should trigger the function. If you have the application open in the browser, you should be able to see the data streaming in via the chart that are automatically updated. For example:
+
+![Application Dashboard](doc-images/app-dashboard.png)
