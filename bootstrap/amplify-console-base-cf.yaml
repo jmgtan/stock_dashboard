@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  AmplifyBackendDeploymentRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: AmplifyBackendDeploymentRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "amplify.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "Policy0"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: [
+                  "s3:*",
+                  "codecommit:*",
+                  "appsync:*",
+                  "dynamodb:*",
+                  "cloudformation:*",
+                  "iam:*",
+                  "cognito-idp:*",
+                  "cognito-identity:*",
+                  "sns:*",
+                  "lambda:*"
+                ]
+                Resource: "*"

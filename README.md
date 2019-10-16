@@ -15,6 +15,11 @@ This demo application consists of the following components:
 
 ![Image of High-Level Architecture](doc-images/blog_stock_dashboard.png)
 
+## Installation Requirements
+
+1. AWS CLI (>= 1.16.234)
+2. Amplify CLI (>= 1.11.0)
+
 # Local Installation
 
 ## Install the [AWS Amplify Framework CLI](https://aws-amplify.github.io/docs/)
@@ -56,6 +61,44 @@ The push commands will create the following:
 
 # Deploy Application using Amplify Console
 
+Execute the following CloudFormation to create the `AmplifyBackendDeploymentRole` service role that would be used by Amplify.
+
+```bash
+aws cloudformation deploy --template-file bootstrap/amplify-console-base-cf.yaml --stack-name StockDashboardBase --capabilities CAPABILITY_NAMED_IAM
+```
+
+Alternatively, you can go to the IAM console and create a new role that has the following permissions (make sure that it has a trust relationship with Amplify (amplify.amazonaws.com).):
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:*",
+                "codecommit:*",
+                "appsync:*",
+                "dynamodb:*",
+                "cloudformation:*",
+                "iam:*",
+                "cognito-idp:*",
+                "cognito-identity:*",
+                "sns:*",
+                "lambda:*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+```
+
+Login to your Github account and fork the repository:
+
+![Github Fork Repository](doc-images/github-fork-repo.png)
+
+Alternatively, you can clone the repository and push it to either Github or CodeCommit.
+
 Go to the AWS Management Console and then Amplify. Click "Get Started" under "Deploy", see following screenshot:
 
 ![Amplify Overview](doc-images/amplify-overview-deploy.png)
@@ -64,11 +107,19 @@ You should be able to see a screen like the following:
 
 ![Amplify Connect](doc-images/amplify-connect.png)
 
-Either "fork" from the GitHub repository, or clone and then push to your own repository. Once your repo has been selected, Amplify should automatically generate a build configuration. Make sure to select "Create new environment":
+Once your repo has been selected, Amplify should automatically generate a build configuration. Make sure to select "Create new environment":
 
-![Amplify Build Settings](doc-images/amplify-build-settings.png)
+![Amplify Build Settings](doc-images/amplify-create-env-service-role.png)
 
-Also create a new [Service Role](https://docs.aws.amazon.com/amplify/latest/userguide/how-to-service-role-amplify-console.html) and then click "Next", confirm and then deploy. This will automatically deploy both frontend and backend. You can keep track of the deployment process by drilling down and see the logs that are being streamed in.
+Select the role (`AmplifyBackendDeploymentRole`) that was created by the bootstrap CloudFormation template and then click "Next". This will automatically deploy both frontend and backend. You can keep track of the deployment process by drilling down and see the logs that are being streamed in.
+
+Once the deployment finishes, there's one more step to make sure that the React Router works. Go to the "Rewrites and redirects" section:
+
+![Rewrites and redirects](doc-images/menu-rewrites.png)
+
+Modify the default rule and change the "Source address" to `</^((?!\.(css|gif|ico|jpg|js|png|txt|svg|woff|ttf)$).)*$/>`, and the "Type" to `200 (Rewrite)`, it should look like this:
+
+![Rewrite Rule](doc-images/rewrite-rule.png)
 
 # Setup the Data Feed Integration
 
