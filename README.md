@@ -59,6 +59,12 @@ The push commands will create the following:
 * DynamoDB
 * AppSync API
 
+## Install frontend dependencies
+
+```bash
+npm install
+```
+
 # Deploy Application using Amplify Console
 
 Execute the following CloudFormation to create the `AmplifyBackendDeploymentRole` service role that would be used by Amplify.
@@ -220,7 +226,11 @@ If you deployed the application locally, you can start the server using the foll
 npm start
 ```
 
-This command would automatically open the browser. If this is your first time accessing the application, you should create a new account and validate it. Once you're logged in you can start adding stock symbols to monitor. See the following screenshot:
+This command would automatically open the browser. 
+
+Alternatively, if you deployed via the Amplify Console, you can open the application using the URL generated from Amplify Console.
+
+If this is your first time accessing the application, you should create a new account and validate it. Once you're logged in you can start adding stock symbols to monitor. See the following screenshot:
 
 ![Manage Stock Symbols](doc-images/manage-stock-symbols.png)
 
