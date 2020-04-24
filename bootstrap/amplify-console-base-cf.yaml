@@ -32,6 +32,7 @@ Resources:
                   "cognito-idp:*",
                   "cognito-identity:*",
                   "sns:*",
-                  "lambda:*"
+                  "lambda:*",
+                  "amplify:*"
                 ]
                 Resource: "*"

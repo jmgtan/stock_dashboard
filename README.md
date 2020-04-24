@@ -9,7 +9,7 @@ This demo application consists of the following components:
 * Authentication is done via Amazon Cognito
 * AWS Secrets Manager is used to store the API Keys that will be used to query the data feed.
 * AWS Lambda and Amazon CloudWatch Events are used to regularly fetch the latest Intraday prices from the data feed.
-* The data feed that this demo uses is from [Alpha Vantage](https://alphavantage.co)
+* The data feed that this demo uses is from [Alpha Vantage](https://www.alphavantage.co)
 
 ## High-Level Architecture
 
@@ -31,12 +31,13 @@ npm install -g @aws-amplify/cli
 ## Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
 
 ```bash
-git clone git@github.com:jmgtan/stock_dashboard.git
+git clone https://github.com/jmgtan/stock_dashboard.git
 ```
 
 ## Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.
 
 ```bash
+cd stock_dashboard
 amplify env add
 ```
 
@@ -90,7 +91,8 @@ Alternatively, you can go to the IAM console and create a new role that has the 
                 "cognito-idp:*",
                 "cognito-identity:*",
                 "sns:*",
-                "lambda:*"
+                "lambda:*",
+                "amplify:*"
             ],
             "Resource": "*",
             "Effect": "Allow"
@@ -166,7 +168,7 @@ aws secretsmanager create-secret --name "stockMonitoring/<env>/backend" --secret
 Create entry for the data feed API key
 
 ```bash
-aws secretsmanager create-secret --name "stockMonitoringDashboard/<env>/datafeed" --secret-string '{"feed_api_key": "<feed api key>"}'
+aws secretsmanager create-secret --name "stockMonitoring/<env>/datafeed" --secret-string '{"feed_api_key": "<feed api key>"}'
 ```
 
 ## Configure the Backend Lambda
