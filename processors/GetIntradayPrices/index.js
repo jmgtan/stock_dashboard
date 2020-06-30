@@ -7,7 +7,7 @@ const axios = require('axios');
 const moment = require("moment-timezone");
 require("isomorphic-fetch");
 
-AWS.config.update({region: "eu-west-1"});
+AWS.config.update({region: configExports.appsync_region});
 
 const getBackendTokens = async(sm) => {
     const idp = new AWS.CognitoIdentityServiceProvider();
@@ -50,6 +50,8 @@ const getPrices = async(apiKey, symbol) => {
     const data = response.data;
     if ("Note" in data) {
         console.log("["+symbol+"] Rate limit exceeded, skipping request");
+        return [];
+    } else if ("Error Message" in data) {
         return [];
     } else {
         const metadata = data["Meta Data"];
