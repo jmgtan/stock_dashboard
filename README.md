@@ -152,7 +152,7 @@ We're going to create a new user in the user pool specifically for the use of th
 ```bash
 aws cognito-idp admin-create-user --user-pool-id <value of user pool id> --username "<email of new admin user>" --user-attributes=Name=email,Value="<email of new admin user>" --message-action "SUPPRESS"
 
-aws cognito-idp admin-set-user-password --user-pool-id eu-west-1_qqHO7Lr1S --username "<email of new admin user>" --password "<password>" --permanent
+aws cognito-idp admin-set-user-password --user-pool-id <value of user pool id> --username "<email of new admin user>" --password "<password>" --permanent
 ```
 
 Remember the email and password for the admin user, the next step is to store these values in AWS Secrets Manager for the backend Lambda function to consume.
