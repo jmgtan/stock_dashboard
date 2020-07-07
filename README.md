@@ -1,5 +1,30 @@
 # Stock Monitoring Dashboard
 
+## Table of Contents
+- [Stock Monitoring Dashboard](#stock-monitoring-dashboard)
+  * [Components](#components)
+  * [High-Level Architecture](#high-level-architecture)
+  * [Installation Requirements](#installation-requirements)
+- [Deployment](#deployment)
+  * [Local Deployment](#local-deployment)
+    + [Install the AWS Amplify Framework CLI](#install-the--aws-amplify-framework-cli--https---aws-amplifygithubio-docs--)
+    + [Clone the repo from Github](#clone-the-repo-from--github--https---githubcom-jmgtan-stock-dashboard-)
+    + [Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.](#once-the-repo-has-been-cloned--we-can-then-initialize-the-amplify-project-by-connecting-it-to-your-aws-account)
+    + [Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.](#once-the-initial-bootstrapping-has-been-completed--you-can-then-start-creating-the-resources-that-is-related-to-our-application)
+    + [Install frontend dependencies](#install-frontend-dependencies)
+  * [(Alternative) Deploy Application using Amplify Console](#-alternative--deploy-application-using-amplify-console)
+- [Setup the Data Feed Integration](#setup-the-data-feed-integration)
+  * [Where to get Config Values?](#where-to-get-config-values-)
+    + [Local Deployment](#local-deployment-1)
+    + [(Alternative) Amplify Console](#-alternative--amplify-console)
+  * [Register for an API Key from the Data Feed Provider](#register-for-an-api-key-from-the-data-feed-provider)
+  * [Create Cognito User Pool Client for the Backend](#create-cognito-user-pool-client-for-the-backend)
+  * [Create Backend User](#create-backend-user)
+  * [Create Secrets Manager Entries](#create-secrets-manager-entries)
+  * [Configure the Backend Lambda](#configure-the-backend-lambda)
+  * [Deploy via CloudFormation](#deploy-via-cloudformation)
+- [Testing](#testing)
+
 ## Components
 
 This demo application consists of the following components:
@@ -20,21 +45,24 @@ This demo application consists of the following components:
 1. AWS CLI (>= 1.16.234)
 2. Amplify CLI (>= 1.11.0)
 
-# Local Installation
+# Deployment
+You can either deploy it locally or use [AWS Amplify](https://aws.amazon.com/amplify/) to host the application for you. The succeeding sections describes both approaches so you only need to pick one.
 
-## Install the [AWS Amplify Framework CLI](https://aws-amplify.github.io/docs/)
+## Local Deployment
+
+### Install the [AWS Amplify Framework CLI](https://aws-amplify.github.io/docs/)
 
 ```bash
 npm install -g @aws-amplify/cli
 ```
 
-## Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
+### Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
 
 ```bash
 git clone https://github.com/jmgtan/stock_dashboard.git
 ```
 
-## Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.
+### Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.
 
 ```bash
 cd stock_dashboard
@@ -47,7 +75,7 @@ Use the following values:
 * Enter a name for the environment. You can just input "local"
 * Do you want to use an AWS profile? If you have a profile configured via the AWS CLI, you can reuse the same profile, otherwise choose No and configure accordingly.
 
-## Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.
+### Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.
 
 ```bash
 amplify push
@@ -60,13 +88,13 @@ The push commands will create the following:
 * DynamoDB
 * AppSync API
 
-## Install frontend dependencies
+### Install frontend dependencies
 
 ```bash
 npm install
 ```
 
-# Deploy Application using Amplify Console
+## (Alternative) Deploy Application using Amplify Console
 
 Execute the following CloudFormation to create the `AmplifyBackendDeploymentRole` service role that would be used by Amplify.
 
@@ -131,7 +159,15 @@ Modify the default rule and change the "Source address" to `</^((?!\.(css|gif|ic
 
 # Setup the Data Feed Integration
 
-Open the file `src/aws-exports.js` and take note of the value of `aws_user_pools_id`. We will be using this to create a new app client for the Cognito User Pool.
+## Where to get Config Values?
+
+### Local Deployment
+After running `amplify push` in the previous step, the `src/aws-exports.js` file would be generated. Refer to that file to get the config values for the data feed function.
+
+### (Alternative) Amplify Console
+Since the deployment is handled by the Amplify service, you won't have access to the config file. You would be able to get the config values by going to the different services that the app depends on. These are as follows:
+- Go to Cognito console to get the pool id.
+- Go to AppSync to get the endpoint url.
 
 ## Register for an API Key from the Data Feed Provider
 
