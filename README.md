@@ -12,11 +12,11 @@
     + [Initialize the Project](#initialize-the-project)
     + [Deploy the Backend](#deploy-the-backend)
     + [Install frontend dependencies](#install-frontend-dependencies)
-  * [(Alternative) Deploy Application using Amplify Console](#-alternative--deploy-application-using-amplify-console)
+  * [Deploy Application using Amplify Console](#deploy-application-using-amplify-console)
 - [Setup the Data Feed Integration](#setup-the-data-feed-integration)
   * [Where to get Config Values?](#where-to-get-config-values-)
     + [Local Deployment](#local-deployment-1)
-    + [(Alternative) Amplify Console](#-alternative--amplify-console)
+    + [Amplify Console](#amplify-console)
   * [Register for an API Key from the Data Feed Provider](#register-for-an-api-key-from-the-data-feed-provider)
   * [Create Cognito User Pool Client for the Backend](#create-cognito-user-pool-client-for-the-backend)
   * [Create Backend User](#create-backend-user)
@@ -94,7 +94,7 @@ The push commands will create the following:
 npm install
 ```
 
-## (Alternative) Deploy Application using Amplify Console
+## Deploy Application using Amplify Console
 
 Execute the following CloudFormation to create the `AmplifyBackendDeploymentRole` service role that would be used by Amplify.
 
@@ -164,7 +164,7 @@ Modify the default rule and change the "Source address" to `</^((?!\.(css|gif|ic
 ### Local Deployment
 After running `amplify push` in the previous step, the `src/aws-exports.js` file would be generated. Refer to that file to get the config values for the data feed function.
 
-### (Alternative) Amplify Console
+### Amplify Console
 Since the deployment is handled by the Amplify service, you won't have access to the config file. You would be able to get the config values by going to the different services that the app depends on. These are as follows:
 - Go to Cognito console to get the pool id.
 - Go to AppSync to get the endpoint url.
