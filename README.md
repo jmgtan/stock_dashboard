@@ -7,10 +7,10 @@
   * [Installation Requirements](#installation-requirements)
 - [Deployment](#deployment)
   * [Local Deployment](#local-deployment)
-    + [Install the AWS Amplify Framework CLI](#install-the--aws-amplify-framework-cli--https---aws-amplifygithubio-docs--)
-    + [Clone the repo from Github](#clone-the-repo-from--github--https---githubcom-jmgtan-stock-dashboard-)
-    + [Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.](#once-the-repo-has-been-cloned--we-can-then-initialize-the-amplify-project-by-connecting-it-to-your-aws-account)
-    + [Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.](#once-the-initial-bootstrapping-has-been-completed--you-can-then-start-creating-the-resources-that-is-related-to-our-application)
+    + [Install the Amplify CLI](#install-the-amplify-cli)
+    + [Clone the repo from GitHub](#clone-the-repo-from-github)
+    + [Initialize the Project](#initialize-the-project)
+    + [Deploy the Backend](#deploy-the-backend)
     + [Install frontend dependencies](#install-frontend-dependencies)
   * [(Alternative) Deploy Application using Amplify Console](#-alternative--deploy-application-using-amplify-console)
 - [Setup the Data Feed Integration](#setup-the-data-feed-integration)
@@ -50,19 +50,19 @@ You can either deploy it locally or use [AWS Amplify](https://aws.amazon.com/amp
 
 ## Local Deployment
 
-### Install the [AWS Amplify Framework CLI](https://aws-amplify.github.io/docs/)
+### Install the Amplify CLI
 
 ```bash
 npm install -g @aws-amplify/cli
 ```
 
-### Clone the repo from [Github](https://github.com/jmgtan/stock_dashboard)
+### Clone the repo from GitHub
 
 ```bash
 git clone https://github.com/jmgtan/stock_dashboard.git
 ```
 
-### Once the repo has been cloned, we can then initialize the amplify project by connecting it to your AWS account.
+### Initialize the Project
 
 ```bash
 cd stock_dashboard
@@ -75,7 +75,7 @@ Use the following values:
 * Enter a name for the environment. You can just input "local"
 * Do you want to use an AWS profile? If you have a profile configured via the AWS CLI, you can reuse the same profile, otherwise choose No and configure accordingly.
 
-### Once the initial bootstrapping has been completed, you can then start creating the resources that is related to our application.
+### Deploy the Backend
 
 ```bash
 amplify push
