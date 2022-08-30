@@ -7,7 +7,7 @@
     "@aws-amplify/auth": "^1.2.31",
     "aws-amplify": "^1.1.36",
     "aws-amplify-react": "^2.3.12",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
